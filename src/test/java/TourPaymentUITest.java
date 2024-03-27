@@ -1,5 +1,7 @@
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
 
 import static com.codeborne.selenide.Selenide.*;
@@ -27,9 +29,18 @@ public class TourPaymentUITest {
     private final int shift = 3;
     TourPage tourPage;
 
+    @BeforeAll
+    static void setupAll(){
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
     @BeforeEach
     public void setup() {
         tourPage = open("http://localhost:8080", TourPage.class);
+    }
+
+    @AfterAll
+    static void tearDownAll(){
+        SelenideLogger.removeListener("allure");
     }
 
     @Test

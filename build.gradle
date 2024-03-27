@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'io.qameta.allure' version '2.11.2'
 }
 
 group = 'ru.netology'
@@ -24,6 +25,13 @@ dependencies {
 
     testImplementation 'com.github.javafaker:javafaker:1.0.2' exclude module: 'snakeyaml'
     testImplementation 'org.yaml:snakeyaml:2.0'
+
+    testImplementation 'io.qameta.allure:allure-junit5:2.22.0'
+    testImplementation 'io.qameta.allure:allure-commandline:2.22.0'
+    testImplementation 'io.qameta.allure:allure-assertj:2.22.0'
+    testImplementation 'io.qameta.allure:allure-java-commons:2.22.0'
+    testImplementation 'io.qameta.allure:allure-selenide:2.22.0'
+    testImplementation 'org.aspectj:aspectjweaver:1.9.19'
 }
 
 test {

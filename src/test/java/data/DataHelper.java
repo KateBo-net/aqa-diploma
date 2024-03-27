@@ -4,7 +4,6 @@ import com.github.javafaker.Faker;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
 
@@ -41,11 +40,7 @@ public class DataHelper {
     }
 
     public static String generateNumber(int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int number = 0; number < count; number++) {
-            sb.append("#");
-        }
-        return fakerEN.numerify(sb.toString());
+        return fakerEN.numerify("#".repeat(Math.max(0, count)));
     }
 
     public static String generateSymbolString(int count) {
