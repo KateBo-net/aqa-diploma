@@ -1,23 +1,23 @@
 package data;
 
 public class CardInfo {
-    private final String cardNumber;
+    private final String number;
     private final String month;
     private final String year;
-    private final String owner;
+    private final String holder;
     private final String cvc;
 
 
-    public CardInfo(String cardNumber, String month, String year, String owner, String cvc) {
-        this.cardNumber = cardNumber;
+    public CardInfo(String number, String month, String year, String holder, String cvc) {
+        this.number = number;
         this.month = month;
         this.year = year;
-        this.owner = owner;
+        this.holder = holder;
         this.cvc = cvc;
     }
 
-    public String getCardNumber() {
-        return cardNumber;
+    public String getNumber() {
+        return number;
     }
 
     public String getMonth() {
@@ -28,8 +28,8 @@ public class CardInfo {
         return year;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getHolder() {
+        return holder;
     }
 
     public String getCvc() {

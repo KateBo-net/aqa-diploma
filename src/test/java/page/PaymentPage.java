@@ -26,10 +26,10 @@ public class PaymentPage {
     }
 
     public void fillCardData(CardInfo info) {
-        cardNumberInput.setValue(info.getCardNumber());
+        cardNumberInput.setValue(info.getNumber());
         monthInput.setValue(info.getMonth());
         yearInput.setValue(info.getYear());
-        ownerInput.setValue(info.getOwner());
+        ownerInput.setValue(info.getHolder());
         cvcInput.setValue(info.getCvc());
         sendForm();
     }

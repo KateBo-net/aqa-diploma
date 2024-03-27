@@ -17,7 +17,7 @@ public class DataHelper {
     public static final Faker fakerRU = new Faker(new Locale("ru-RU"));
 
     public static String generateMonth(int bound) {
-        return "0" + new Random().nextInt(bound) + 1;
+        return "0" + (new Random().nextInt(bound) + 1);
     }
 
     public static String generateYear(int shift) {
