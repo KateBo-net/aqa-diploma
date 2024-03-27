@@ -10,14 +10,14 @@ import static com.codeborne.selenide.Selenide.$$;
 
 public class PaymentPage {
 
-    private final ElementsCollection fields = $$(".input__control");
+    private final ElementsCollection fields = $$(".input__box input");
     private final SelenideElement cardNumberInput = fields.get(0);
     private final SelenideElement monthInput = fields.get(1);
     private final SelenideElement yearInput = fields.get(2);
     private final SelenideElement ownerInput = fields.get(3);
     private final SelenideElement cvcInput = fields.get(4);
     private final SelenideElement btnSend = $("form button");
-    private final ElementsCollection inputInvalidMsg = $$(".input_invalid .input__sub");
+    private final ElementsCollection collectionInvalidMsg = $$(".input_invalid .input__sub");
     private final SelenideElement notificationMsg = $(".notification__title");
 
     public PaymentPage() {
@@ -38,18 +38,20 @@ public class PaymentPage {
         btnSend.click();
     }
 
+    public ElementsCollection getCollectionInvalidMsg(){
+        return collectionInvalidMsg;
+    }
+    public SelenideElement getInvalidMsg(int indexField){
+        return fields.get(indexField).parent().parent().find(".input_invalid .input__sub");
+    }
+
     public SelenideElement validPayment(CardInfo info) {
         fillCardData(info);
         return notificationMsg;
     }
 
-    public ElementsCollection invalidPayment(CardInfo info) {
-        fillCardData(info);
-        return inputInvalidMsg;
+    public String getFieldValue(int fieldIndex){
+        return fields.get(fieldIndex).getValue();
     }
 
-    public ElementsCollection sendEmptyFields(){
-        sendForm();
-        return inputInvalidMsg;
-    }
 }

@@ -1,11 +1,11 @@
 package data;
 
 public class CardInfo {
-    private String cardNumber;
-    private String month;
-    private String year;
-    private String owner;
-    private String cvc;
+    private final String cardNumber;
+    private final String month;
+    private final String year;
+    private final String owner;
+    private final String cvc;
 
 
     public CardInfo(String cardNumber, String month, String year, String owner, String cvc) {

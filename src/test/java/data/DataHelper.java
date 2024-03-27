@@ -16,29 +16,31 @@ public class DataHelper {
     private static final Faker fakerEN = new Faker(Locale.ENGLISH);
     public static final Faker fakerRU = new Faker(new Locale("ru-RU"));
 
-    public String generateMonth(int bound) {
+    public static String generateMonth(int bound) {
         return "0" + new Random().nextInt(bound) + 1;
     }
 
-    public String generateYear(int shift) {
+    public static String generateYear(int shift) {
         return LocalDate.now().plusYears(shift).format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
-    public String generateName() {
+    public static String generateName() {
         return fakerEN.name().firstName();
     }
 
-    public String generateLastName() {
+    public static String generateLastName() {
         return fakerEN.name().lastName();
     }
-    public String generateOwner(){
-        return generateName()+generateLastName();
-    }
-    public String generateCyrillicOwner(){
-        return fakerRU.name().firstName() + fakerRU.name().lastName();
+
+    public static String generateOwner() {
+        return generateName() + " " + generateLastName();
     }
 
-    public String generateNumber(int count) {
+    public static String generateCyrillicOwner() {
+        return fakerRU.name().firstName() + " " + fakerRU.name().lastName();
+    }
+
+    public static String generateNumber(int count) {
         StringBuilder sb = new StringBuilder();
         for (int number = 0; number < count; number++) {
             sb.append("#");
@@ -46,16 +48,16 @@ public class DataHelper {
         return fakerEN.numerify(sb.toString());
     }
 
-    public String generateSymbolString(int count){
+    public static String generateSymbolString(int count) {
         StringBuilder sb = new StringBuilder();
         String[] symbols = {"<", "(", "[", "{", "^", "-", "=", "$", "!", "|", "]", "}", ")", "?", "*", "+", ".", ">"};
-        for (int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++) {
             sb.append(symbols[new Random().nextInt(symbols.length)]);
         }
         return sb.toString();
     }
 
-    public CardInfo generateValidCardInfo(int status) {
+    public static CardInfo generateValidCardInfo(int status) {
         if (status == 0) {
             return new CardInfo(approvedCardNumber, generateMonth(12), generateYear(3), generateOwner(), generateNumber(3));
 
