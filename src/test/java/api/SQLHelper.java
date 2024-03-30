@@ -30,8 +30,7 @@ public class SQLHelper {
     }
 
     public static String getStatusFromPaymentEntity() {
-        try(Connection connect = getConnection())
-        {
+        try (Connection connect = getConnection()) {
             String queryStatus = "SELECT status  FROM payment_entity ORDER by created DESC LIMIT 1";
             return QUERY_RUNNER.query(connect, queryStatus, new ScalarHandler<>());
         } catch (SQLException e) {
@@ -41,8 +40,7 @@ public class SQLHelper {
     }
 
     public static String getAmountFromPaymentEntity() {
-        try(Connection connect = getConnection())
-        {
+        try (Connection connect = getConnection()) {
             String queryAmount = "SELECT amount  FROM payment_entity ORDER by created DESC LIMIT 1";
             return QUERY_RUNNER.query(connect, queryAmount, new ScalarHandler<>()).toString();
         } catch (SQLException e) {
@@ -52,8 +50,7 @@ public class SQLHelper {
     }
 
     public static String getStatusFromCreditEntity() {
-        try(Connection connect = getConnection())
-        {
+        try (Connection connect = getConnection()) {
             String queryStatus = "SELECT status  FROM credit_request_entity ORDER by created DESC LIMIT 1";
             return QUERY_RUNNER.query(connect, queryStatus, new ScalarHandler<>());
         } catch (SQLException e) {

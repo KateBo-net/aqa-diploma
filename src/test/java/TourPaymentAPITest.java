@@ -15,7 +15,7 @@ public class TourPaymentAPITest {
     private final String expectedAmount = "45000";
 
     @BeforeAll
-    static void setupAll(){
+    static void setupAll() {
         SelenideLogger.addListener("allure", new AllureSelenide());
     }
 
@@ -27,7 +27,7 @@ public class TourPaymentAPITest {
 
     @Test
     @DisplayName("Отправка запроса на оплату тура по дебетовой карте со статусом “APPROVED”")
-    public void payByCardStatusApproved(){
+    public void payByCardStatusApproved() {
         CardInfo approvedCard = generateValidCardInfo(0);
 
         String paymentStatusResponse = postPaymentByCard(approvedCard);
@@ -43,7 +43,7 @@ public class TourPaymentAPITest {
 
     @Test
     @DisplayName("Отправка запроса на оплату тура по дебетовой карте со статусом “DECLINED”")
-    public void payByCardStatusDeclined(){
+    public void payByCardStatusDeclined() {
         CardInfo approvedCard = generateValidCardInfo(1);
 
         String paymentStatusResponse = postPaymentByCard(approvedCard);
@@ -59,7 +59,7 @@ public class TourPaymentAPITest {
 
     @Test
     @DisplayName("Отправка запроса на оплату тура в кредит по карте со статусом “APPROVED”")
-    public void payByCreditStatusApproved(){
+    public void payByCreditStatusApproved() {
         CardInfo approvedCard = generateValidCardInfo(0);
 
         String paymentStatusResponse = postPaymentByCredit(approvedCard);
@@ -73,7 +73,7 @@ public class TourPaymentAPITest {
 
     @Test
     @DisplayName("Отправка запроса на оплату тура в кредит по карте со статусом “DECLINED”")
-    public void payByCreditStatusDeclined(){
+    public void payByCreditStatusDeclined() {
         CardInfo approvedCard = generateValidCardInfo(1);
 
         String paymentStatusResponse = postPaymentByCredit(approvedCard);

@@ -33,7 +33,7 @@ public class RequestGenerator {
                 .extract().jsonPath().getString("status");
     }
 
-    public static String postPaymentByCredit(CardInfo card){
+    public static String postPaymentByCredit(CardInfo card) {
         return given()
                 .spec(requestSpec)
                 .body(card)

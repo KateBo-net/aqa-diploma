@@ -22,7 +22,7 @@ public class TourPaymentUITest {
     private final String declinedCardMsg = "Ошибка";
     private final String wrongFormatMsg = "Неверный формат";
     private final String expiredCard = "Истёк срок действия карты";
-    private final String wrongYear = "Неверно указан срок действия карты";
+    private final String wrongDate = "Неверно указан срок действия карты";
     private final int cvcCount = 3;
     private final int cardNumberCount = 16;
     private final int monthCount = 12;
@@ -30,16 +30,17 @@ public class TourPaymentUITest {
     TourPage tourPage;
 
     @BeforeAll
-    static void setupAll(){
+    static void setupAll() {
         SelenideLogger.addListener("allure", new AllureSelenide());
     }
+
     @BeforeEach
     public void setup() {
         tourPage = open("http://localhost:8080", TourPage.class);
     }
 
     @AfterAll
-    static void tearDownAll(){
+    static void tearDownAll() {
         SelenideLogger.removeListener("allure");
     }
 
@@ -81,7 +82,6 @@ public class TourPaymentUITest {
         notificationMsg
                 .shouldBe(visible, Duration.ofSeconds(10))
                 .shouldHave(text(declinedCardMsg));
-
         //отображаются оба уведомления поверх ошибка, снизу успешно, поэтому ловиться первый элемент успешно
     }
 
@@ -199,7 +199,7 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Месяц”: число 13")
     public void validationFieldMonth13Value() {
-        CardInfo invalidMonth = new CardInfo("", String.valueOf(monthCount + 1), "", "", "");
+        CardInfo invalidMonth = new CardInfo(generateNumber(cardNumberCount), String.valueOf(monthCount + 1), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidMonth);
@@ -207,13 +207,13 @@ public class TourPaymentUITest {
 
         invalidMsg
                 .shouldBe(visible)
-                .shouldHave(text(wrongFormatMsg));
+                .shouldHave(text(wrongDate));
     }
 
     @Test
     @DisplayName("Валидация данных в поле “Месяц”: цифры от 1 до 9")
     public void validationFieldMonthDigitsValue() {
-        CardInfo invalidMonth = new CardInfo("", generateNumber(1), "", "", "");
+        CardInfo invalidMonth = new CardInfo(generateNumber(cardNumberCount), generateNumber(1), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidMonth);
@@ -301,7 +301,7 @@ public class TourPaymentUITest {
 
         invalidMsg
                 .shouldBe(visible)
-                .shouldHave(text(wrongYear));
+                .shouldHave(text(wrongDate));
     }
 
     @Test
@@ -335,7 +335,7 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: имя + фамилия латиница")
     public void validationFieldOwnerLatin() {
-        CardInfo latinOwner = new CardInfo("", "", "", generateOwner(), "");
+        CardInfo latinOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(latinOwner);
@@ -561,9 +561,7 @@ public class TourPaymentUITest {
                 .shouldHave(text(wrongFormatMsg));
     }
 
-
-
-
+    // Тесты на форму кредита
     @Test
     @DisplayName("Оплата тура в кредит со статусом «APPROVED»")
     public void creditForTourByCardStatusApproved() {
@@ -719,7 +717,7 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Месяц”: число 13")
     public void validationCreditFieldMonth13Value() {
-        CardInfo invalidMonth = new CardInfo("", String.valueOf(monthCount + 1), "", "", "");
+        CardInfo invalidMonth = new CardInfo(generateNumber(cardNumberCount), String.valueOf(monthCount + 1), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidMonth);
@@ -727,13 +725,13 @@ public class TourPaymentUITest {
 
         invalidMsg
                 .shouldBe(visible)
-                .shouldHave(text(wrongFormatMsg));
+                .shouldHave(text(wrongDate));
     }
 
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Месяц”: цифры от 1 до 9")
     public void validationCreditFieldMonthDigitsValue() {
-        CardInfo invalidMonth = new CardInfo("", generateNumber(1), "", "", "");
+        CardInfo invalidMonth = new CardInfo(generateNumber(cardNumberCount), generateNumber(1), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidMonth);
@@ -821,7 +819,7 @@ public class TourPaymentUITest {
 
         invalidMsg
                 .shouldBe(visible)
-                .shouldHave(text(wrongYear));
+                .shouldHave(text(wrongDate));
     }
 
     @Test
@@ -855,7 +853,7 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: имя + фамилия латиница")
     public void validationCreditFieldOwnerLatin() {
-        CardInfo latinOwner = new CardInfo("", "", "", generateOwner(), "");
+        CardInfo latinOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(latinOwner);
