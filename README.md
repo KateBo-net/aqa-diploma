@@ -1,6 +1,8 @@
 # Документация
 [План тестирования](https://github.com/KateBo-net/aqa-diploma/blob/master/documents/Plan.md)
+
 [Отчет по итогам тестирования](https://github.com/KateBo-net/aqa-diploma/blob/master/documents/Report.md)
+
 [Отчет по итогам автоматизации](https://github.com/KateBo-net/aqa-diploma/blob/master/documents/Summary.md)
 
 # Инструкция для запуска автотестов
