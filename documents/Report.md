@@ -7,23 +7,24 @@
 
 ## Итоги тестирования
 ### При подключении к СУБД PostgreSQL
-  - Passed test 77.5%
-  - Failed test 22.5%
+  - Passed test 80%
+  - Failed test 20%
 
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/cab7bc05-6938-48df-b5ba-b16c4af0eef6)
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/e6db89c2-8eb6-4baf-b2b8-30e0d1167a62)
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/f314236e-9a2c-4189-af1f-ded0dad36756)
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/41f4c626-3898-4f3c-9bd1-61f14b480845)
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/193b9cc1-1897-4c9c-985b-6ebacc91ff85)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/76e5daa2-a827-43ae-bc48-a159696ce842)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/de294ecd-64a1-40dc-8c56-5e44fa8c998a)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/32641559-eaa2-48b5-8b1a-983ebb79ade6)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/bdf06622-ca60-41d8-a8d0-913234e37b49)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/64549300-ff36-439d-aca3-6efafa0e9ed4)
 
 ### При подключении к СУБД MySQL
-  - Passed test 77.5%
-  - Failed test 22.5%
+  - Passed test 80%
+  - Failed test 20%
 
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/0577d3eb-c184-4c4c-854f-8558c1fe1d25)
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/ddc3cb54-40c6-4522-8ca7-38db6f7b3e6b)
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/333a827e-4668-41d9-83f2-c9c1850a1b8e)
-![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/760de17a-ec8e-4c76-8567-345a562fb13a)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/49034adc-7b9c-4c20-832f-a3dd772db559)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/5acd1a90-d7a4-480f-b495-e2c34618da10)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/7e1a26a1-df33-4601-86a1-44c42e6bdcb1)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/555afc1f-43c6-4ba1-a17b-29229af0b923)
+![image](https://github.com/KateBo-net/aqa-diploma/assets/92302507/dac31ebc-4053-43a0-88a0-c5c3aad0832a)
 
 На все обнаруженные дефекты заведены [баг-репорты](https://github.com/KateBo-net/aqa-diploma/issues)
 
