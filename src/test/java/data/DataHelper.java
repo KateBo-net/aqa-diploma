@@ -15,8 +15,9 @@ public class DataHelper {
     private static final Faker fakerEN = new Faker(Locale.ENGLISH);
     public static final Faker fakerRU = new Faker(new Locale("ru-RU"));
 
-    public static String generateMonth(int bound) {
-        return "0" + (new Random().nextInt(bound) + 1);
+    public static String generateMonth() {
+        int shift = (new Random().nextInt(12) + 1);
+        return LocalDate.now().plusMonths(shift).format(DateTimeFormatter.ofPattern("MM"));
     }
 
     public static String generateYear(int shift) {
@@ -54,10 +55,10 @@ public class DataHelper {
 
     public static CardInfo generateValidCardInfo(int status) {
         if (status == 0) {
-            return new CardInfo(approvedCardNumber, generateMonth(12), generateYear(3), generateOwner(), generateNumber(3));
+            return new CardInfo(approvedCardNumber, generateMonth(), generateYear(3), generateOwner(), generateNumber(3));
 
         }
-        return new CardInfo(declinedCardNumber, generateMonth(12), generateYear(3), generateOwner(), generateNumber(3));
+        return new CardInfo(declinedCardNumber, generateMonth(), generateYear(3), generateOwner(), generateNumber(3));
     }
 
 }

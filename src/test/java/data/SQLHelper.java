@@ -1,4 +1,4 @@
-package api;
+package data;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
@@ -15,7 +15,7 @@ public class SQLHelper {
     }
 
     private static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(System.getProperty("db.url"), "app", "pass");
+        return DriverManager.getConnection(System.getProperty("db.url"), System.getProperty("db.user"), System.getProperty("db.pass"));
 
     }
 

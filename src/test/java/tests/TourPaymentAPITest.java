@@ -1,10 +1,12 @@
+package tests;
+
 import com.codeborne.selenide.logevents.SelenideLogger;
 import data.CardInfo;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
 
 import static api.RequestGenerator.*;
-import static api.SQLHelper.*;
+import static data.SQLHelper.*;
 import static data.DataHelper.generateValidCardInfo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,16 +14,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TourPaymentAPITest {
     private final String expectedApproved = "APPROVED";
     private final String expectedDeclined = "DECLINED";
-    private final String expectedAmount = "45000";
+    private final String expectedAmount = "4500000";
 
     @BeforeAll
     static void setupAll() {
         SelenideLogger.addListener("allure", new AllureSelenide());
     }
 
+    @AfterEach
+    public void tearDown(){
+        cleanDB();
+    }
+
     @AfterAll
     public static void tearDownAll() {
-        cleanDB();
         SelenideLogger.removeListener("allure");
     }
 

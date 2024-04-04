@@ -1,3 +1,5 @@
+package tests;
+
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.logevents.SelenideLogger;
@@ -11,10 +13,9 @@ import page.PaymentPage;
 import page.TourPage;
 import data.CardInfo;
 
-import java.time.Duration;
-
 import static data.DataHelper.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TourPaymentUITest {
 
@@ -36,7 +37,7 @@ public class TourPaymentUITest {
 
     @BeforeEach
     public void setup() {
-        tourPage = open("http://localhost:8080", TourPage.class);
+        tourPage = open(System.getProperty("sut.url"), TourPage.class);
     }
 
     @AfterAll
@@ -50,11 +51,9 @@ public class TourPaymentUITest {
         CardInfo approvedCard = generateValidCardInfo(0);
 
         PaymentPage paymentPage = tourPage.payByCard();
-        SelenideElement notificationMsg = paymentPage.validPayment(approvedCard);
+        String notificationMsg = paymentPage.validPayment(approvedCard);
 
-        notificationMsg
-                .shouldBe(visible, Duration.ofSeconds(10))
-                .shouldHave(text(approvedCardMsg));
+        assertTrue(notificationMsg.contains(approvedCardMsg));
     }
 
     @Test
@@ -63,25 +62,21 @@ public class TourPaymentUITest {
         CardInfo declinedCard = generateValidCardInfo(1);
 
         PaymentPage paymentPage = tourPage.payByCard();
-        SelenideElement notificationMsg = paymentPage.validPayment(declinedCard);
+        String notificationMsg = paymentPage.validPayment(declinedCard);
 
-        notificationMsg
-                .shouldBe(visible, Duration.ofSeconds(10))
-                .shouldHave(text(declinedCardMsg));
+        assertTrue(notificationMsg.contains(declinedCardMsg));
         //отображается уведомление успешно вместо ошибки
     }
 
     @Test
     @DisplayName("Оплата тура картой с незарегистрированным номером")
     public void paymentForTourByNotRegisteredCard() {
-        CardInfo unregisteredCard = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner(), generateNumber(cvcCount));
+        CardInfo unregisteredCard = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
-        SelenideElement notificationMsg = paymentPage.validPayment(unregisteredCard);
+        String notificationMsg = paymentPage.validPayment(unregisteredCard);
 
-        notificationMsg
-                .shouldBe(visible, Duration.ofSeconds(10))
-                .shouldHave(text(declinedCardMsg));
+        assertTrue(notificationMsg.contains(declinedCardMsg));
         //отображаются оба уведомления поверх ошибка, снизу успешно, поэтому ловиться первый элемент успешно
     }
 
@@ -102,7 +97,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(validCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
         invalidMsg.shouldNot(exist);
     }
@@ -114,7 +109,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
         invalidMsg
                 .shouldBe(visible)
@@ -128,10 +123,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
         //добавляем к количеству цифр в номере карты 3 пробела разделителя
-        assertEquals(cardNumberCount + 3, paymentPage.getFieldValue(0).length());
+        assertEquals(cardNumberCount + 3, paymentPage.getFieldValueCardNumber().length());
         invalidMsg.shouldNot(exist);
     }
 
@@ -143,10 +138,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
 
-        assertEquals(0, paymentPage.getFieldValue(0).length());
+        assertEquals(0, paymentPage.getFieldValueCardNumber().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -160,10 +155,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
 
-        assertEquals(0, paymentPage.getFieldValue(0).length());
+        assertEquals(0, paymentPage.getFieldValueCardNumber().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -172,11 +167,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Месяц”: число от 1 до 12 в двузначном формате")
     public void validationFieldMonthValidValue() {
-        CardInfo validMonth = new CardInfo("", generateMonth(monthCount), "", "", "");
+        CardInfo validMonth = new CardInfo("", generateMonth(), "", "", "");
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(validMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg.shouldNot(exist);
 
@@ -189,7 +184,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -203,7 +198,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -217,7 +212,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -231,7 +226,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -245,7 +240,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -259,7 +254,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(currentYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg.shouldNot(exist);
     }
@@ -267,11 +262,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Год”: предыдущий год")
     public void validationFieldYearPrev() {
-        CardInfo prevYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(-1), generateOwner(), generateNumber(cvcCount));
+        CardInfo prevYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(-1), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(prevYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg
                 .shouldBe(visible)
@@ -281,11 +276,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Год”: плюс 5 лет к текущему году")
     public void validationFieldYearPlus5() {
-        CardInfo plus5Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(5), generateOwner(), generateNumber(cvcCount));
+        CardInfo plus5Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(5), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(plus5Year);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg.shouldNot(exist);
     }
@@ -293,11 +288,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Год”: плюс 6 лет к текущему году")
     public void validationFieldYearPlus6() {
-        CardInfo plus6Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(6), generateOwner(), generateNumber(cvcCount));
+        CardInfo plus6Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(6), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(plus6Year);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg
                 .shouldBe(visible)
@@ -307,12 +302,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Год”: спец. символы")
     public void validationFieldYearSpecialSymbol() {
-        CardInfo specialSymbolsYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateSymbolString(2), generateOwner(), generateNumber(cvcCount));
+        CardInfo specialSymbolsYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateSymbolString(2), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(specialSymbolsYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
-
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -321,11 +315,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Год”: буквы")
     public void validationFieldYearLetters() {
-        CardInfo lettersYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateLastName(), generateOwner(), generateNumber(cvcCount));
+        CardInfo lettersYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateLastName(), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(lettersYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg
                 .shouldBe(visible)
@@ -335,11 +329,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: имя + фамилия латиница")
     public void validationFieldOwnerLatin() {
-        CardInfo latinOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner(), generateNumber(cvcCount));
+        CardInfo latinOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(latinOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -348,11 +342,11 @@ public class TourPaymentUITest {
     @DisplayName("Валидация данных в поле “Владелец”: дефис в имени")
     public void validationFieldOwnerHyphenInName() {
         String hyphenInName = generateName() + "-" + generateName() + " " + generateLastName();
-        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), hyphenInName, generateNumber(cvcCount));
+        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), hyphenInName, generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(hyphenOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -361,11 +355,11 @@ public class TourPaymentUITest {
     @DisplayName("Валидация данных в поле “Владелец”: дефис в фамилии")
     public void validationFieldOwnerHyphenInLastName() {
         String hyphenInLastName = generateName() + " " + generateLastName() + "-" + generateLastName();
-        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), hyphenInLastName, generateNumber(cvcCount));
+        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), hyphenInLastName, generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(hyphenOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -373,11 +367,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: upper case")
     public void validationFieldOwnerUpperCase() {
-        CardInfo upperCaseOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner().toUpperCase(), generateNumber(cvcCount));
+        CardInfo upperCaseOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner().toUpperCase(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(upperCaseOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -385,11 +379,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: только имя")
     public void validationFieldOwnerOnlyName() {
-        CardInfo onlyNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateName(), generateNumber(cvcCount));
+        CardInfo onlyNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateName(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(onlyNameOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -399,11 +393,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: только фамилия")
     public void validationFieldOwnerOnlyLastName() {
-        CardInfo onlyLastNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateLastName(), generateNumber(cvcCount));
+        CardInfo onlyLastNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateLastName(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(onlyLastNameOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -413,11 +407,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: лишний пробел в начале")
     public void validationFieldOwnerOnlyStartExtraSpace() {
-        CardInfo startExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), " " + generateOwner(), generateNumber(cvcCount));
+        CardInfo startExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), " " + generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(startExtraSpaceOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -425,11 +419,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: лишний пробел в середине")
     public void validationFieldOwnerOnlyStartMiddleExtraSpace() {
-        CardInfo middleExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateName() + " " + " " + generateLastName(), generateNumber(cvcCount));
+        CardInfo middleExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateName() + " " + " " + generateLastName(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(middleExtraSpaceOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -437,11 +431,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: лишний пробел в конце")
     public void validationFieldOwnerOnlyStartEndExtraSpace() {
-        CardInfo endExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner() + " ", generateNumber(cvcCount));
+        CardInfo endExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner() + " ", generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(endExtraSpaceOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -449,11 +443,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: кириллица")
     public void validationFieldOwnerCyrillic() {
-        CardInfo cyrillicOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateCyrillicOwner(), generateNumber(cvcCount));
+        CardInfo cyrillicOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateCyrillicOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(cyrillicOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -463,11 +457,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: спец. символы")
     public void validationFieldSpecialSymbol() {
-        CardInfo specialSymbolOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateSymbolString(5), generateNumber(cvcCount));
+        CardInfo specialSymbolOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateSymbolString(5), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(specialSymbolOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -477,11 +471,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных в поле “Владелец”: цифры")
     public void validationFieldDigits() {
-        CardInfo digitsOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateNumber(5), generateNumber(cvcCount));
+        CardInfo digitsOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateNumber(5), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(digitsOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -495,7 +489,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(validCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         invalidMsg.shouldNot(exist);
     }
@@ -508,7 +502,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(lessDigitsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         invalidMsg
                 .shouldBe(visible)
@@ -522,10 +516,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(moreDigitsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         //поле не принимает больше необходимого количества цифр
-        assertEquals(cvcCount, paymentPage.getFieldValue(4).length());
+        assertEquals(cvcCount, paymentPage.getFieldValueCVC().length());
         invalidMsg.shouldNot(exist);
     }
 
@@ -536,10 +530,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(specialSymbolsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         //поле не принимает ничего кроме цифр
-        assertEquals(0, paymentPage.getFieldValue(4).length());
+        assertEquals(0, paymentPage.getFieldValueCVC().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -552,10 +546,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCard();
         paymentPage.fillCardData(specialSymbolsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         //поле не принимает ничего кроме цифр
-        assertEquals(0, paymentPage.getFieldValue(4).length());
+        assertEquals(0, paymentPage.getFieldValueCVC().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -568,11 +562,9 @@ public class TourPaymentUITest {
         CardInfo approvedCard = generateValidCardInfo(0);
 
         PaymentPage paymentPage = tourPage.payByCredit();
-        SelenideElement notificationMsg = paymentPage.validPayment(approvedCard);
+        String notificationMsg = paymentPage.validPayment(approvedCard);
 
-        notificationMsg
-                .shouldBe(visible, Duration.ofSeconds(10))
-                .shouldHave(text(approvedCardMsg));
+        assertTrue(notificationMsg.contains(approvedCardMsg));
     }
 
     @Test
@@ -581,25 +573,21 @@ public class TourPaymentUITest {
         CardInfo declinedCard = generateValidCardInfo(1);
 
         PaymentPage paymentPage = tourPage.payByCredit();
-        SelenideElement notificationMsg = paymentPage.validPayment(declinedCard);
+        String notificationMsg = paymentPage.validPayment(declinedCard);
 
-        notificationMsg
-                .shouldBe(visible, Duration.ofSeconds(10))
-                .shouldHave(text(declinedCardMsg));
+        assertTrue(notificationMsg.contains(declinedCardMsg));
         //отображается уведомление успешно вместо ошибки
     }
 
     @Test
     @DisplayName("Оплата тура в кредит с незарегистрированным номером карты")
     public void creditForTourByNotRegisteredCard() {
-        CardInfo unregisteredCard = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner(), generateNumber(cvcCount));
+        CardInfo unregisteredCard = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
-        SelenideElement notificationMsg = paymentPage.validPayment(unregisteredCard);
+        String notificationMsg = paymentPage.validPayment(unregisteredCard);
 
-        notificationMsg
-                .shouldBe(visible, Duration.ofSeconds(10))
-                .shouldHave(text(declinedCardMsg));
+        assertTrue(notificationMsg.contains(declinedCardMsg));
         //отображаются оба уведомления поверх ошибка, снизу успешно, поэтому ловиться первый элемент успешно
     }
 
@@ -620,7 +608,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(validCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
         invalidMsg.shouldNot(exist);
     }
@@ -632,7 +620,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
         invalidMsg
                 .shouldBe(visible)
@@ -646,10 +634,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
         //добавляем к количеству цифр в номере карты 3 пробела разделителя
-        assertEquals(cardNumberCount + 3, paymentPage.getFieldValue(0).length());
+        assertEquals(cardNumberCount + 3, paymentPage.getFieldValueCardNumber().length());
         invalidMsg.shouldNot(exist);
     }
 
@@ -661,10 +649,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
 
-        assertEquals(0, paymentPage.getFieldValue(0).length());
+        assertEquals(0, paymentPage.getFieldValueCardNumber().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -678,10 +666,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidCardNumber);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(0);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCardNumber();
 
 
-        assertEquals(0, paymentPage.getFieldValue(0).length());
+        assertEquals(0, paymentPage.getFieldValueCardNumber().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -690,11 +678,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Месяц”: число от 1 до 12 в двузначном формате")
     public void validationCreditFieldMonthValidValue() {
-        CardInfo validMonth = new CardInfo("", generateMonth(monthCount), "", "", "");
+        CardInfo validMonth = new CardInfo("", generateMonth(), "", "", "");
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(validMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg.shouldNot(exist);
 
@@ -707,7 +695,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -721,7 +709,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -735,7 +723,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -749,7 +737,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -763,7 +751,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(invalidMonth);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(1);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgMonth();
 
         invalidMsg
                 .shouldBe(visible)
@@ -777,7 +765,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(currentYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg.shouldNot(exist);
     }
@@ -785,11 +773,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Год”: предыдущий год")
     public void validationCreditFieldYearPrev() {
-        CardInfo prevYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(-1), generateOwner(), generateNumber(cvcCount));
+        CardInfo prevYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(-1), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(prevYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg
                 .shouldBe(visible)
@@ -799,11 +787,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Год”: плюс 5 лет к текущему году")
     public void validationCreditFieldYearPlus5() {
-        CardInfo plus5Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(5), generateOwner(), generateNumber(cvcCount));
+        CardInfo plus5Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(5), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(plus5Year);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg.shouldNot(exist);
     }
@@ -811,11 +799,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Год”: плюс 6 лет к текущему году")
     public void validationCreditFieldYearPlus6() {
-        CardInfo plus6Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(6), generateOwner(), generateNumber(cvcCount));
+        CardInfo plus6Year = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(6), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(plus6Year);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg
                 .shouldBe(visible)
@@ -825,11 +813,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Год”: спец. символы")
     public void validationCreditFieldYearSpecialSymbol() {
-        CardInfo specialSymbolsYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateSymbolString(2), generateOwner(), generateNumber(cvcCount));
+        CardInfo specialSymbolsYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateSymbolString(2), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(specialSymbolsYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg
                 .shouldBe(visible)
@@ -839,11 +827,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Год”: буквы")
     public void validationCreditFieldYearLetters() {
-        CardInfo lettersYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateLastName(), generateOwner(), generateNumber(cvcCount));
+        CardInfo lettersYear = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateLastName(), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(lettersYear);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(2);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgYear();
 
         invalidMsg
                 .shouldBe(visible)
@@ -853,11 +841,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: имя + фамилия латиница")
     public void validationCreditFieldOwnerLatin() {
-        CardInfo latinOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner(), generateNumber(cvcCount));
+        CardInfo latinOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(latinOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -866,11 +854,11 @@ public class TourPaymentUITest {
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: дефис в имени")
     public void validationCreditFieldOwnerHyphenInName() {
         String hyphenInName = generateName() + "-" + generateName() + " " + generateLastName();
-        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), hyphenInName, generateNumber(cvcCount));
+        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), hyphenInName, generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(hyphenOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -879,11 +867,11 @@ public class TourPaymentUITest {
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: дефис в фамилии")
     public void validationCreditFieldOwnerHyphenInLastName() {
         String hyphenInLastName = generateName() + " " + generateLastName() + "-" + generateLastName();
-        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), hyphenInLastName, generateNumber(cvcCount));
+        CardInfo hyphenOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), hyphenInLastName, generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(hyphenOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -891,11 +879,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: upper case")
     public void validationCreditFieldOwnerUpperCase() {
-        CardInfo upperCaseOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner().toUpperCase(), generateNumber(cvcCount));
+        CardInfo upperCaseOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner().toUpperCase(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(upperCaseOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -903,11 +891,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: только имя")
     public void validationCreditFieldOwnerOnlyName() {
-        CardInfo onlyNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateName(), generateNumber(cvcCount));
+        CardInfo onlyNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateName(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(onlyNameOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -917,11 +905,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: только фамилия")
     public void validationCreditFieldOwnerOnlyLastName() {
-        CardInfo onlyLastNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateLastName(), generateNumber(cvcCount));
+        CardInfo onlyLastNameOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateLastName(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(onlyLastNameOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -931,11 +919,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: лишний пробел в начале")
     public void validationCreditFieldOwnerOnlyStartExtraSpace() {
-        CardInfo startExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), " " + generateOwner(), generateNumber(cvcCount));
+        CardInfo startExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), " " + generateOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(startExtraSpaceOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -943,11 +931,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: лишний пробел в середине")
     public void validationCreditFieldOwnerOnlyStartMiddleExtraSpace() {
-        CardInfo middleExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateName() + " " + " " + generateLastName(), generateNumber(cvcCount));
+        CardInfo middleExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateName() + " " + " " + generateLastName(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(middleExtraSpaceOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -955,11 +943,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: лишний пробел в конце")
     public void validationCreditFieldOwnerOnlyStartEndExtraSpace() {
-        CardInfo endExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateOwner() + " ", generateNumber(cvcCount));
+        CardInfo endExtraSpaceOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateOwner() + " ", generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(endExtraSpaceOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg.shouldNot(exist);
     }
@@ -967,11 +955,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: кириллица")
     public void validationCreditFieldOwnerCyrillic() {
-        CardInfo cyrillicOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateCyrillicOwner(), generateNumber(cvcCount));
+        CardInfo cyrillicOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateCyrillicOwner(), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(cyrillicOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -981,11 +969,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: спец. символы")
     public void validationCreditFieldSpecialSymbol() {
-        CardInfo specialSymbolOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateSymbolString(5), generateNumber(cvcCount));
+        CardInfo specialSymbolOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateSymbolString(5), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(specialSymbolOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -995,11 +983,11 @@ public class TourPaymentUITest {
     @Test
     @DisplayName("Валидация данных формы Кредит в поле “Владелец”: цифры")
     public void validationCreditFieldDigits() {
-        CardInfo digitsOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(monthCount), generateYear(shift), generateNumber(5), generateNumber(cvcCount));
+        CardInfo digitsOwner = new CardInfo(generateNumber(cardNumberCount), generateMonth(), generateYear(shift), generateNumber(5), generateNumber(cvcCount));
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(digitsOwner);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(3);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgOwner();
 
         invalidMsg
                 .shouldBe(visible)
@@ -1013,7 +1001,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(validCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         invalidMsg.shouldNot(exist);
     }
@@ -1026,7 +1014,7 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(lessDigitsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         invalidMsg
                 .shouldBe(visible)
@@ -1040,10 +1028,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(moreDigitsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         //поле не принимает больше необходимого количества цифр
-        assertEquals(cvcCount, paymentPage.getFieldValue(4).length());
+        assertEquals(cvcCount, paymentPage.getFieldValueCVC().length());
         invalidMsg.shouldNot(exist);
     }
 
@@ -1054,10 +1042,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(specialSymbolsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         //поле не принимает ничего кроме цифр
-        assertEquals(0, paymentPage.getFieldValue(4).length());
+        assertEquals(0, paymentPage.getFieldValueCVC().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));
@@ -1070,10 +1058,10 @@ public class TourPaymentUITest {
 
         PaymentPage paymentPage = tourPage.payByCredit();
         paymentPage.fillCardData(specialSymbolsCVC);
-        SelenideElement invalidMsg = paymentPage.getInvalidMsg(4);
+        SelenideElement invalidMsg = paymentPage.getInvalidMsgCVC();
 
         //поле не принимает ничего кроме цифр
-        assertEquals(0, paymentPage.getFieldValue(4).length());
+        assertEquals(0, paymentPage.getFieldValueCVC().length());
         invalidMsg
                 .shouldBe(visible)
                 .shouldHave(text(wrongFormatMsg));

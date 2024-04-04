@@ -4,6 +4,8 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import data.CardInfo;
 
+import java.time.Duration;
+
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
@@ -41,17 +43,45 @@ public class PaymentPage {
     public ElementsCollection getCollectionInvalidMsg(){
         return collectionInvalidMsg;
     }
-    public SelenideElement getInvalidMsg(int indexField){
+    private SelenideElement getInvalidMsg(int indexField){
         return fields.get(indexField).parent().parent().find(".input_invalid .input__sub");
     }
 
-    public SelenideElement validPayment(CardInfo info) {
-        fillCardData(info);
-        return notificationMsg;
+    public SelenideElement getInvalidMsgCardNumber(){
+        return getInvalidMsg(0);
     }
 
-    public String getFieldValue(int fieldIndex){
+    public SelenideElement getInvalidMsgMonth(){
+        return getInvalidMsg(1);
+    }
+
+    public SelenideElement getInvalidMsgYear(){
+        return getInvalidMsg(2);
+    }
+
+    public SelenideElement getInvalidMsgOwner(){
+        return getInvalidMsg(3);
+    }
+
+    public SelenideElement getInvalidMsgCVC(){
+        return getInvalidMsg(4);
+    }
+    public String validPayment(CardInfo info) {
+        fillCardData(info);
+        return notificationMsg
+                .shouldBe(visible, Duration.ofSeconds(15))
+                .getText();
+    }
+
+    private String getFieldValue(int fieldIndex){
         return fields.get(fieldIndex).getValue();
     }
 
+    public String getFieldValueCardNumber(){
+        return getFieldValue(0);
+    }
+
+    public String getFieldValueCVC(){
+        return getFieldValue(4);
+    }
 }
