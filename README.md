@@ -16,10 +16,11 @@
 2. Склонировать репозиторий https://github.com/KateBo-net/aqa-diploma
 3. Открыть его в Intelij IDEA
 4. Ввести в терминале команду `docker-compose up`
-5.1. Для запуска с поддержкой СУБД MySQL:
+5. Для запуска с поддержкой
+   - *СУБД MySQL*:
        - Ввести в терминале команду `java -jar ./artifacts/aqa-shop.jar`
        - Нажать `ctrl` дважды - открыть окно Run anything. Ввести команду `gradlew clean test`
-5.2. Для запуска с поддержкой СУБД PostgreSQL:
+   - *СУБД PostgreSQL*:
        - Ввести в терминале команду ` java "-Dspring.datasource.url=jdbc:postgresql://localhost:5432/app" -jar artifacts/aqa-shop.jar`
        - Нажать `ctrl` дважды - открыть окно Run anything. Ввести команду `gradlew clean test "-Ddb.url=jdbc:postgresql://localhost:5432/app"`
 9. Для генерации Allure отчета нажать: gradle-verification-allureServe
